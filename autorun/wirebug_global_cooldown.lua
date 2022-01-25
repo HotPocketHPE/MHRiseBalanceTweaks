@@ -1,4 +1,6 @@
 
+local ConfigData = require("MHRBT_config")
+
 local function GetLocalPlayer()
     local playerManager = sdk.get_managed_singleton("snow.player.PlayerManager")
     if playerManager == nil then return end
@@ -7,12 +9,13 @@ local function GetLocalPlayer()
     return player
 end
 
-
-WirebugRechargeTimeMultiplier = 3.0
+-- Vars written to in pre method, then used to update fields in post method
+local _wirebugShouldModifyTime
+local _wirebugIndex
+local _wirebugTime
 
 -- TODO see if modifying value arguments on the stack is possible
 local function PreSetWirebugTime(args)
-    --log.debug("Called pre hook")
     _wirebugShouldModifyTime = false
     local callingPlayer = sdk.to_managed_object(args[2])
     -- is this check needed?
@@ -20,7 +23,7 @@ local function PreSetWirebugTime(args)
 
     _wirebugShouldModifyTime = true
     _wirebugIndex = sdk.to_int64(args[3])
-    _wirebugTime = sdk.to_float(args[4]) * WirebugRechargeTimeMultiplier
+    _wirebugTime = sdk.to_float(args[4]) * ConfigData.WirebugRechargeTimeMultiplier
     return
 end
 
