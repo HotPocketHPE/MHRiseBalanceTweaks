@@ -16,7 +16,7 @@ local function PreSetWirebugTime(args)
     if GetLocalPlayer():get_address() ~= callingPlayer:get_address() then return end
 
     local wirebugNewTime = sdk.to_float(args[4]) * ConfigData.WirebugRechargeTimeMultiplier
-    args[4] = sdk.float_to_ptr(_wirebugTime)
+    args[4] = sdk.float_to_ptr(wirebugNewTime)
     return
 end
 
