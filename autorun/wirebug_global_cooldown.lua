@@ -9,37 +9,18 @@ local function GetLocalPlayer()
     return player
 end
 
--- Vars written to in pre method, then used to update fields in post method
-local _wirebugShouldModifyTime
-local _wirebugIndex
-local _wirebugTime
-
--- TODO see if modifying value arguments on the stack is possible
 local function PreSetWirebugTime(args)
-    _wirebugShouldModifyTime = false
+
     local callingPlayer = sdk.to_managed_object(args[2])
     -- is this check needed?
-    if not GetLocalPlayer():get_address() == callingPlayer:get_address() then return end
+    if GetLocalPlayer():get_address() ~= callingPlayer:get_address() then return end
 
-    _wirebugShouldModifyTime = true
-    _wirebugIndex = sdk.to_int64(args[3])
-    _wirebugTime = sdk.to_float(args[4]) * ConfigData.WirebugRechargeTimeMultiplier
+    local wirebugNewTime = sdk.to_float(args[4]) * ConfigData.WirebugRechargeTimeMultiplier
+    args[4] = sdk.float_to_ptr(_wirebugTime)
     return
 end
 
-local function WriteModifiedWirebugTime()
-    local wireGaugeArr = GetLocalPlayer():get_field("_HunterWireGauge")
-    if wireGaugeArr == nil then return end
-    local wireGaugeData = wireGaugeArr:get_element(_wirebugIndex)
-    wireGaugeData:set_field("_RecastTimer", _wirebugTime)
-    wireGaugeData:set_field("_RecastTimerMax", _wirebugTime)
-end
-
 local function PostSetWirebugTime(retval)
-    if (_wirebugShouldModifyTime) then
-        WriteModifiedWirebugTime()
-    end
-    _wirebugShouldModifyTime = false
     return retval
 end
 
